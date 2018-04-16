@@ -1,0 +1,85 @@
+<div class="row">
+  <div class="col">
+    <div class="card mb-2">
+      <div class="card-body">
+          <div class="clearfix">
+
+            <h4 class="card-title text-center">
+              Task Name: <%= @task.title %>
+            </h4>
+          </div>
+
+          <%= if @task.user_id != @current_user.id do %>
+            <div class="form-group">
+              <p class="form-control">
+                Responsible For Completing Task: <%= @task.user.name %>
+              </p>
+            </div>
+          <% end %>
+
+          <div class="form-group">
+            <p class="form-control">
+              Task Description: <%= @task.description %>
+            </p>
+          </div>
+
+          <div class="form-group">
+            <p class="form-control">
+            Minutes Worked On Task:
+            <% f = fn(b, acc) -> if b.end_time != nil do acc + DateTime.diff(b.end_time, b.start_time) else acc + DateTime.diff(DateTime.utc_now(), b.start_time) end end %>
+            <%= Enum.reduce(@blocks, 0, f) / 60 %>
+            </p>
+          </div>
+
+          <div class="form-group">
+            Task Complete? <%= @task.completed %>
+          </div>
+
+          <%= if @current_user.id == @task.user_id do %>
+            <div class="form-group">
+              <p>
+                <%= button "Edit", to: task_path(@conn, :edit, @task), method: "get", class: "button" %>
+              </p>
+            </div>
+          <% else %>
+            <%= if !Enum.empty?(@blocks) do %>
+              <table class="table table-striped mb-0 border-0">
+                <thead>
+                  <tr>
+                    <th class="border-0">time block</th>
+                    <th class="border-0">start</th>
+                    <th class="border-0">end</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%= for block <- Enum.sort(@blocks, fn(a, b) -> a.id > b.id end) do %>
+                    <tr>
+                      <td class="align-middle border-0">
+                        <%= block.id %>
+                      </td>
+                      <td class="align-middle border-0">
+                        <input type="text" value="<%= block.start_time %>"
+                          class="start-time w-100" data-id="<%= block.id %>">
+                      </td>
+                      <td class="align-middle border-0">
+                        <input type="text" value="<%= block.end_time %>"
+                          class="end-time w-100" data-id="<%= block.id %>">
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            <% end %>
+
+            <div class="form-group">
+              <p>
+                <%= button "Back", to: task_path(@conn, :index), method: "get",
+                  class: "btn btn-primary btn-block bp border-0",
+                  role: "button"%>
+              </p>
+            </div>
+          <% end %>
+      </div>
+    </div>
+  </div>
+</div>

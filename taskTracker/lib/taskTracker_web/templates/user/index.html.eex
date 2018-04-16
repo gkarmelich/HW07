@@ -1,0 +1,56 @@
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title text-center mb-2">Staff Directory</h2>
+        <table class="table table-striped mb-0 border-0">
+          <thead>
+            <tr>
+              <th class="border-0">User Name</th>
+              <th class="border-0">User Email</th>
+              <th class="border-0">Manager</th>
+              <th class="border-0"></th>
+              <th class="border-0"></th>
+            </tr>
+          </thead>
+          <tbody>
+          <%= for user <- @users do %>
+            <tr>
+              <td class="align-middle border-0"><%= user.name %></td>
+              <td class="align-middle border-0"><%= user.email %></td>
+
+              <td class="align-middle border-0">
+                <%= if user.manager == nil do "none" else user.manager.name end %>
+              </td>
+
+              <td class="align-middle border-0">
+                <%= button "View Profile", to: user_path(@conn, :show, user), method: "get",
+                  class: "btn btn-primary bp border-0", role: "button" %>
+              </td>
+
+              <td class="align-middle border-0">
+                <% changeset = TaskTracker.Accounts.change_user(user) %>
+                <%= form_for changeset, user_path(@conn, :update, user), fn f -> %>
+                  <%= if changeset.action do %>
+                    <div class="alert alert-danger">
+                      <p>Oops, something went wrong! Please check the errors below.</p>
+                    </div>
+                  <% end %>
+                  <%= hidden_input f, :name, value: user.name %>
+                  <%= error_tag f, :name %>
+                  <%= hidden_input f, :email, value: user.email %>
+                  <%= error_tag f, :email %>
+                  <%= hidden_input f, :manager_id, value: @current_user.id %>
+                  <%= error_tag f, :manager_id %>
+                  <%= submit "Add On My Staff",
+                    class: "btn btn-danger bd border-0" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

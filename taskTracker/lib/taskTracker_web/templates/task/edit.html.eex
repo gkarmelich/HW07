@@ -1,0 +1,103 @@
+<script>
+  window.block_path = "<%= block_path(@conn, :index) %>";
+</script>
+
+<div class="row">
+  <div class="col">
+    <div class="card mb-2">
+      <div class="card-body">
+        <div class="clearfix">
+       
+          <p>Task Title: <%= @task.title %>
+          <br>Task Description: <%= @task.description %></br>
+          Task Complete: <%= @task.completed %></br></p>
+
+        </div>
+
+        <%= form_for @changeset, task_path(@conn, :update, @task), fn f -> %>
+          <%= if @changeset.action do %>
+            <div class="alert alert-danger">
+              <p>Oops, something went wrong! Please check the errors below.</p>
+            </div>
+          <% end %>
+
+          <%= if @task.completed do %>
+            <%= hidden_input f, :completed, class: "form-control", value: "false" %>
+            <%= error_tag f, :completed %>
+            <div class="form-group">
+              <%= submit "Continue Working on Task",
+                class: "btn btn-primary btn-block bp border-0" %>
+            </div>
+          <% else %>
+            <%= hidden_input f, :completed, class: "form-control", value: "true" %>
+            <%= error_tag f, :completed %>
+            <div class="form-group">
+              <%= submit "Mark Task Complete",
+                class: "btn btn-danger btn-block bd border-0" %>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%= if !@task.completed do %>
+          <div class="form-group">
+            <% open_blocks = Enum.filter(@blocks, fn b -> b.end_time == nil end) %>
+            <%= if Enum.empty?(open_blocks) do %>
+              <%= button " Update Time", to: task_path(@conn, :edit, @task), method: "get",
+                class: "btn btn-primary btn-block bp border-0 create-block-btn",
+                role: "button", data: [task_id: Integer.to_string(@task.id)] %>
+            <% else %>
+              <% [open_block | _rest] = open_blocks %>
+              <%= button "End Time Block", to: task_path(@conn, :edit, @task), method: "get",
+                class: "btn btn-primary btn-block bp border-0 stop-block-btn",
+                role: "button",
+                data: [id: Integer.to_string(open_block.id), task_id: Integer.to_string(open_block.task_id), start_time: DateTime.to_string(open_block.start_time)] %>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%= if !Enum.empty?(@blocks) do %>
+          <table class="table table-striped mb-0 border-0">
+            <thead>
+              <tr>
+                <th class="border-0">Index</th>
+                <th class="border-0">Time Started</th>
+                <th class="border-0">Time Finished</th>
+                <th class="border-0"></th>
+                <th class="border-0"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <%= for block <- @blocks do %>
+                <tr>
+                  <td class="align-middle border-0">
+                    <%= block.id %>
+                  </td>
+                  <td class="align-middle border-0">
+                    <input type="text" value="<%= block.start_time %>"
+                      class="start-time w-100" data-id="<%= block.id %>">
+                  </td>
+                  <td class="align-middle border-0">
+                    <input type="text" value="<%= block.end_time %>"
+                      class="end-time w-100" data-id="<%= block.id %>">
+                  </td>
+
+                  <td class="align-middle border-0">
+                    <%= button "update", to: task_path(@conn, :edit, @task), method: "get",
+                      class: "btn btn-primary btn-block bp border-0 update-block-btn",
+                      role: "button", data: [id: Integer.to_string(block.id), task_id: Integer.to_string(block.task_id)] %>
+                  </td>
+
+                  <td class="align-middle border-0">
+                    <%= button "delete", to: task_path(@conn, :edit, @task), method: "get",
+                      class: "btn btn-danger btn-block bd border-0 delete-block-btn",
+                      role: "button", data: [id: Integer.to_string(block.id)] %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

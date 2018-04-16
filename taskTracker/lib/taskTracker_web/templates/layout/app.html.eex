@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Hello TaskTracker!</title>
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+  </head>
+
+  <body class="homepage">
+    <div class="container">
+      <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+        <h1 class="navbar-brand mb-0"></h1>
+        <%= if @current_user do %>
+          <%= button "My Tasks", to: page_path(@conn, :feed), method: "get", class: "nav-item nav-link" %>
+          <%= button "Task Directory", to: task_path(@conn, :index), method: "get", class: "nav-item nav-link" %>
+          <%= button "Staff Directory", to: user_path(@conn, :index), method: "get", class: "nav-item nav-link" %>
+          <%= button "View/Edit My Profile", to: user_path(@conn, :edit, @current_user.id), method: "get", class: "nav-item nav-link" %>
+          <%= button "Log Out", to: "/session", method: :delete, method: "delete", class: "nav-item nav-link" %>
+        <% end %>
+      </nav>
+
+      <%= if get_flash(@conn, :info) do %>
+        <p class="alert alert-info text-center border-0" role="alert">
+          <%= get_flash(@conn, :info) %>
+        </p>
+      <% end %>
+      <%= if get_flash(@conn, :error) do %>
+        <p class="alert alert-danger text-center border-0" role="alert">
+          <%= get_flash(@conn, :error) %>
+        </p>
+      <% end %>
+      <main role="main">
+        <%= render @view_module, @view_template, assigns %>
+      </main>
+
+    </div> <!-- /container -->
+    <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+  </body>
+</html>

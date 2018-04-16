@@ -1,0 +1,61 @@
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title text-center">Edit My Profile</h2>
+        <%= form_for @changeset, user_path(@conn, :update, @user), fn f -> %>
+          <%= if @changeset.action do %>
+            <div class="alert alert-danger">
+              <p>Oops, something went wrong! Please check the errors below.</p>
+            </div>
+          <% end %>
+
+          <div class="form-group">
+            My Email
+            <%= text_input f, :email, placeholder: "user@example.com",
+              class: "form-control" %>
+            <%= error_tag f, :email %>
+          </div>
+
+          <div class="form-group">
+            My Name
+            <%= text_input f, :name, placeholder: "your name here",
+              class: "form-control" %>
+            <%= error_tag f, :name %>
+          </div>
+
+          <div class="form-group">
+            My Manager
+            <%= select f, :manager_id,
+              Enum.map(@users, fn u -> {u.name, u.id} end),
+              prompt: "none", class: "custom-select" %>
+            <%= error_tag f, :manager_id %>
+          </div>
+
+          <div class="form-group">
+            <p class="form-control">
+              My Staff: <%= Enum.map @subordinate_names, fn name -> %>
+              <%= name <> " " %>
+              <% end %>
+            </p>
+          </div>
+
+          <div class="form-group">
+            <%= submit "Update",
+              class: "btn btn-primary btn-block bp border-0" %>
+
+            <%= button "Delete Your Profile", to: user_path(@conn, :delete, @user), method: "get",
+              method: :delete,
+              data: [confirm: "Are you sure you want to delete your account? This action is irreversible!"],
+              class: "btn btn-danger btn-block bd border-0",
+              role: "button" %>
+
+            <%= button "Back", to: page_path(@conn, :feed), method: "get",
+              class: "btn btn-secondary btn-block bs border-0",
+              role: "button" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
